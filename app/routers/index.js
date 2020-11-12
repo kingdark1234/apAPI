@@ -1,1 +1,1 @@
-exports.thingsRouter = require("./things");
+exports.apRouter = require("./ap");
