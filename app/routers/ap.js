@@ -7,7 +7,7 @@ const { UserHandler, UsersHandler } = require("../handlers");
 // globals
 const router = new express.Router();
 const { readUsers } = UsersHandler;
-const { createUser, readUser, updateUser, deleteUser,readBook } = UserHandler;
+const { createUser, readUser, updateUser, deleteUser,getBooks,readBooks } = UserHandler;
 
 /* All the Things Route */
 router
@@ -23,7 +23,11 @@ router
   .delete(deleteUser);
 
 router
+  .route("/read")
+  .post(readBooks)
+
+router
   .route("/read/:username")
-  .get(readBook)
+  .get(getBooks)
 
 module.exports = router;

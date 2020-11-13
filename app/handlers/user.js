@@ -2,9 +2,9 @@
 const { validate } = require("jsonschema");
 
 // app imports
-const { User,Book } = require("../models");
+const { User,Book,Read } = require("../models");
 const { APIError } = require("../helpers");
-const { userNewSchema,bookSchema } = require("../schemas");
+const { userNewSchema,readSchema } = require("../schemas");
 
 /**
  * Validate the POST request body and create a new Thing
@@ -83,13 +83,47 @@ async function deleteUser(request, response, next) {
   }
 }
 
-async function readBook(request, response, next) {
+async function getBooks(request, response, next) {
   const { username } = request.params;
   try {
     const userNameRes = await User.readUser(username);
     const project = userNameRes.project
-    const bookRes = await Book.readBook(project)
+    const bookRes = await Book.getBooks(project)
     return response.json(bookRes);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+async function readBooks(request, response, next) {
+  const validation = validate(request.body, readSchema);
+  if (!validation.valid) {
+    return next(
+      new APIError(
+        400,
+        "Bad Request",
+        validation.errors.map(e => e.stack).join(". ")
+      )
+    );
+  }
+
+  try {
+    const {username,title} = request.body
+    const userNameRes = await User.readUser(username);
+    const bookRes = await Book.getBook(title)
+    console.log(userNameRes.project,bookRes.project)
+    if(userNameRes.project !== bookRes.project && bookRes.project !== 'All'){
+      return next(
+        new APIError(
+          403,
+          "Permission deny",
+          "You do not read other project"
+        )
+      );
+    }
+    const payload = {...request.body, readAt:new Date()}
+    const newRead = await Read.createRead(new Read(payload));
+    return response.status(201).json(newRead);
   } catch (err) {
     return next(err);
   }
@@ -100,5 +134,6 @@ module.exports = {
   readUser,
   updateUser,
   deleteUser,
-  readBook
+  getBooks,
+  readBooks
 };

@@ -19,14 +19,26 @@ const bookSchema = new Schema({
 
 
 bookSchema.statics = {
-  async readBook(project) {
+  async getBooks(project) {
     try {
       const book = await this.find({project:[project,'All']});
 
       if (!book) {
         throw new APIError(404, "Book Not Found", `No thing '${project}' found.`);
       }
-      console.log(book)
+    return book;  
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  async getBook(title) {
+    try {
+      const book = await this.findOne({$or:[{titleTH:title},{titleEN:title}]});
+
+      if (!book) {
+        throw new APIError(404, "Book Not Found", `No thing '${project}' found.`);
+      }
     return book;  
     } catch (error) {
       console.log(error)
@@ -40,7 +52,6 @@ bookSchema.options.toObject.transform = (doc, ret) => {
   const transformed = ret;
   delete transformed._id;
   delete transformed.__v;
-  delete transformed.password;
   return transformed;
 };
 

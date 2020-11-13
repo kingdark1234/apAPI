@@ -1,2 +1,2 @@
 exports.userNewSchema = require('./user');
-exports.bookSchema = require('./book');
+exports.readSchema = require('./read');

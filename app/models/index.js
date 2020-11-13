@@ -1,2 +1,3 @@
 exports.User = require("./User");
-exports.Book = require("./book");
+exports.Book = require("./Book");
+exports.Read = require("./Read")
